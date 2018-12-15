@@ -8,6 +8,7 @@
 #include "smt/solver.h"
 #include "util/errors.h"
 #include <memory>
+#include <set>
 #include <string>
 #include <ostream>
 #include <unordered_map>
@@ -59,5 +60,16 @@ public:
   TypingAssignments getTypings() const;
   void fixupTypes(const TypingAssignments &ty);
 };
+
+smt::expr preprocess(const Transform &t, const std::set<smt::expr> &qvars0,
+                const std::set<smt::expr> &undef_qvars, smt::expr && e);
+
+
+using print_var_val_ty = std::function<void(std::ostream&, const smt::Model&)>;
+
+bool error(util::Errors &errs, const IR::State &src_state, const IR::State &tgt_state,
+                  const smt::Result &r, const IR::Value *var,
+                  const char *msg, bool check_each_var,
+                  print_var_val_ty print_var_val);
 
 }
