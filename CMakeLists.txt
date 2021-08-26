@@ -210,12 +210,15 @@ else()
   message(STATUS "Skipping translation validation plugin")
 endif()
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads)
+
 add_executable(alive
                "tools/alive.cpp"
                "${PROJECT_BINARY_DIR}/tools/alive_lexer.cpp"
                "tools/alive_parser.cpp"
               )
-target_link_libraries(alive PRIVATE ${ALIVE_LIBS} pthread)
+target_link_libraries(alive PRIVATE ${ALIVE_LIBS} Threads::Threads)
 
 add_executable(alive-jobserver
                "tools/alive-jobserver.cpp"
