@@ -210,18 +210,18 @@ else()
   message(STATUS "Skipping translation validation plugin")
 endif()
 
-add_executable(alive
-               "tools/alive.cpp"
-               "${PROJECT_BINARY_DIR}/tools/alive_lexer.cpp"
-               "tools/alive_parser.cpp"
-              )
-target_link_libraries(alive PRIVATE ${ALIVE_LIBS} pthread)
+#add_executable(alive
+#               "tools/alive.cpp"
+#               "${PROJECT_BINARY_DIR}/tools/alive_lexer.cpp"
+#               "tools/alive_parser.cpp"
+#              )
+#target_link_libraries(alive PRIVATE ${ALIVE_LIBS} pthread)
 
-add_executable(alive-jobserver
-               "tools/alive-jobserver.cpp"
-              )
+#add_executable(alive-jobserver
+#               "tools/alive-jobserver.cpp"
+#              )
 
-#add_library(alive2 SHARED ${IR_SRCS} ${SMT_SRCS} ${TOOLS_SRCS} ${UTIL_SRCS} ${LLVM_UTIL_SRCS})
+add_library(alive2 STATIC ${IR_SRCS} ${SMT_SRCS} ${TOOLS_SRCS} ${UTIL_SRCS} ${LLVM_UTIL_SRCS})
 
 if (BUILD_LLVM_UTILS OR BUILD_TV)
   llvm_map_components_to_libnames(llvm_libs support core irreader analysis passes transformutils)
@@ -237,7 +237,7 @@ if (CYGWIN)
   set(CMAKE_SHARED_LINKER_FLAGS "-L${Z3_LIB_DIR} -lz3")
   file(COPY "${Z3_LIBRARIES}" DESTINATION "${PROJECT_BINARY_DIR}")
 else()
-  target_link_libraries(alive PRIVATE ${Z3_LIBRARIES})
+  #target_link_libraries(alive PRIVATE ${Z3_LIBRARIES})
   #target_link_libraries(alive2 PRIVATE ${Z3_LIBRARIES})
   if (BUILD_LLVM_UTILS OR BUILD_TV)
     target_link_libraries(alive-tv PRIVATE ${Z3_LIBRARIES})

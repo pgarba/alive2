@@ -9,8 +9,10 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#ifndef _WIN32
 #include <sys/wait.h>
 #include <unistd.h>
+#endif
 #include <string.h>
 
 using namespace std;
@@ -24,6 +26,7 @@ void parallel::ensureChild() {
 }
 
 bool parallel::init() {
+#ifndef _WIN32
   assert(parent_pid == -1);
   for (int i = 0; i < max_active_children; ++i) {
     pfd_map.push_back(-1);
@@ -32,14 +35,18 @@ bool parallel::init() {
     p.events = POLL_IN;
   }
   parent_pid = getpid();
+#endif
   return true;
 }
 
 void parallel::reapZombies() {
+#ifndef _WIN32
   while (waitpid((pid_t)-1, nullptr, WNOHANG) > 0)
     ;
+#endif
 }
 
+#ifndef _WIN32
 std::tuple<pid_t, std::ostream *, int> parallel::limitedFork() {
   ensureParent();
 
@@ -111,6 +118,7 @@ std::tuple<pid_t, std::ostream *, int> parallel::limitedFork() {
   }
   return {pid, &newKid.output, index};
 }
+#endif
 
 /*
  * return true iff we got a state change from a child process (either
@@ -123,6 +131,7 @@ std::tuple<pid_t, std::ostream *, int> parallel::limitedFork() {
  * if blocking, only return false when all children have returned EOF
  */
 bool parallel::readFromChildren(bool blocking) {
+#ifndef _WIN32
   const int maxRead = 16 * 4096;
   static char data[maxRead];
   if (active_children == 0)
@@ -151,12 +160,14 @@ bool parallel::readFromChildren(bool blocking) {
       c.output.write(data, size);
     }
   }
+  #endif
   return true;
 }
 
 /*
  * wrapper for write() that correctly handles short writes
  */
+#ifndef _WIN32
 static ssize_t safe_write(int fd, const void *void_buf, size_t count) {
   const char *buf = (const char *)void_buf;
   ssize_t written = 0;
@@ -171,12 +182,14 @@ static ssize_t safe_write(int fd, const void *void_buf, size_t count) {
   }
   return written;
 }
+#endif
 
 /*
  * if is_timeout is true, we in signal handling context and can only
  * call async-safe functions
  */
 void parallel::finishChild(bool is_timeout) {
+#ifndef _WIN32
   ensureChild();
   if (is_timeout) {
     const char *msg = "ERROR: Timeout asynchronous\n\n";
@@ -188,9 +201,11 @@ void parallel::finishChild(bool is_timeout) {
     ENSURE(safe_write(me.pipe[1], data.c_str(), size) == (ssize_t)size);
   }
   putToken();
+#endif
 }
 
 void parallel::finishParent() {
+#ifndef _WIN32
   ensureParent();
   while (readFromChildren(/*blocking=*/true))
     reapZombies();
@@ -198,6 +213,7 @@ void parallel::finishParent() {
   while (wait(nullptr) != -1)
     ;
   ENSURE(emitOutput());
+#endif
 }
 
 /*

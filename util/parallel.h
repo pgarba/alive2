@@ -4,7 +4,9 @@
 // Distributed under the MIT license that can be found in the LICENSE file.
 
 #include <ostream>
+#ifndef _WIN32
 #include <poll.h>
+#endif
 #include <sstream>
 #include <sys/types.h>
 #include <tuple>
@@ -12,7 +14,9 @@
 
 struct childProcess {
   int pipe[2];
+#ifndef _WIN32
   pid_t pid;
+#endif
   /*
    * in a child process, this buffers its output until it is ready to
    * exit. for the parent process, this child's output is stored in
@@ -24,11 +28,15 @@ struct childProcess {
 };
 
 class parallel {
+#ifndef _WIN32
   pid_t parent_pid = -1;
+#endif
   int max_active_children;
   int fd_to_parent;
   int active_children = 0;
+#ifndef _WIN32
   std::vector<pollfd> pfd;
+#endif
   std::vector<int> pfd_map;
   std::vector<childProcess> children;
   std::stringstream &parent_ss;
@@ -64,7 +72,9 @@ public:
    * the child to write its results into and the integer is a unique
    * identifier for this child process.
    */
+#ifndef _WIN32
   virtual std::tuple<pid_t, std::ostream *, int> limitedFork() = 0;
+#endif
 
   /*
    * called from a child that has finished executing
@@ -87,7 +97,9 @@ public:
        std::ostream &out_file)
       : parallel(max_active_children, parent_ss, out_file) {}
   bool init() override;
+#ifndef _WIN32
   std::tuple<pid_t, std::ostream *, int> limitedFork() override;
+#endif
   void finishChild(bool is_timeout) override;
   void finishParent() override;
   void getToken() override;
@@ -100,7 +112,9 @@ public:
                std::ostream &out_file)
       : parallel(max_active_children, parent_ss, out_file) {}
   bool init() override;
+#ifndef _WIN32
   std::tuple<pid_t, std::ostream *, int> limitedFork() override;
+#endif
   void finishChild(bool is_timeout) override;
   void finishParent() override;
   void getToken() override;
@@ -113,7 +127,9 @@ public:
        std::ostream &out_file)
       : parallel(max_active_children, parent_ss, out_file) {}
   bool init() override;
+#ifndef _WIN32
   std::tuple<pid_t, std::ostream *, int> limitedFork() override;
+#endif
   void finishChild(bool is_timeout) override;
   void finishParent() override;
   void getToken() override;

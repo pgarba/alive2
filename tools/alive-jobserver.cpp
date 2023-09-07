@@ -9,8 +9,10 @@
 #include <iostream>
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifndef _WIN32
 #include <sys/wait.h>
 #include <unistd.h>
+#endif
 
 using namespace std;
 
@@ -20,6 +22,7 @@ static const int max_procs = 16384;
 static char fifo_filename[1024];
 
 static void count_tokens(int fd, int nprocs) {
+#ifndef _WIN32
   int flags = fcntl(fd, F_GETFL, 0);
   if (flags == -1) {
     perror("alive-jobserver: fcntl");
@@ -43,14 +46,17 @@ static void count_tokens(int fd, int nprocs) {
          << toks << "\n";
     exit(-1);
   }
+#endif
 }
 
 static void remove_fifo() {
+#ifndef _WIN32
   int res = unlink(fifo_filename);
   if (res != 0) {
     perror("unlink");
     exit(-1);
   }
+#endif
 }
 
 static void sigint_handler(int) {
@@ -93,6 +99,7 @@ int main(int argc, char *const argv[]) {
   if (argc > 2)
     --nprocs;
 
+#ifndef _WIN32
   srand(getpid() + time(nullptr));
   do {
     sprintf(fifo_filename, "/tmp/alive2_fifo_%lx", (unsigned long)rand());
@@ -157,6 +164,6 @@ int main(int argc, char *const argv[]) {
 
   count_tokens(pipefd, nprocs);
   remove_fifo();
-
+ #endif
   return 0;
 }

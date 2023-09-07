@@ -12,6 +12,7 @@
 #include <functional>
 #include <numeric>
 #include <sstream>
+#include <algorithm>
 
 using namespace smt;
 using namespace util;
@@ -1669,7 +1670,7 @@ void FnCall::addArg(Value &arg, ParamAttrs &&attrs) {
 
 vector<Value*> FnCall::operands() const {
   vector<Value*> output;
-  transform(args.begin(), args.end(), back_inserter(output),
+  std::transform(args.begin(), args.end(), back_inserter(output),
             [](auto &p){ return p.first; });
   return output;
 }

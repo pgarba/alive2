@@ -7,6 +7,7 @@
 #include "smt/smt.h"
 #include "util/errors.h"
 #include <cassert>
+#include <algorithm>
 
 using namespace smt;
 using namespace util;

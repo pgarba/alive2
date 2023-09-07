@@ -13,9 +13,11 @@ void unrestricted::getToken() {
 void unrestricted::putToken() {
 }
 
+#ifndef _WIN32
 std::tuple<pid_t, std::ostream *, int> unrestricted::limitedFork() {
   return parallel::limitedFork();
 }
+#endif
 
 void unrestricted::finishChild(bool is_timeout) {
   parallel::finishChild(is_timeout);

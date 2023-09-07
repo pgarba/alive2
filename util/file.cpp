@@ -37,7 +37,7 @@ string get_random_filename(const string &dir, const char *extension) {
   while (fs::exists(path)) {
     path.replace_filename(newname());
   }
-  return path;
+  return path.string();
 }
 
 }

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <set>
 #include <unordered_set>
+#include <algorithm>
 
 using namespace smt;
 using namespace util;
@@ -180,7 +181,7 @@ vector<GlobalVariable *> Function::getGlobalVars() const {
 vector<string_view> Function::getGlobalVarNames() const {
   vector<string_view> gvnames;
   auto gvs = getGlobalVars();
-  transform(gvs.begin(), gvs.end(), back_inserter(gvnames),
+  std::transform(gvs.begin(), gvs.end(), back_inserter(gvnames),
             [](auto &itm) { return string_view(itm->getName()).substr(1); });
   return gvnames;
 }

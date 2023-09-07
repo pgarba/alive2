@@ -13,11 +13,13 @@ void null::getToken() {
 void null::putToken() {
 }
 
+#ifndef _WIN32
 std::tuple<pid_t, std::ostream *, int> null::limitedFork() {
   static int nextPid = 0;
   ++nextPid;
   return {nextPid, nullptr, nextPid};
 }
+#endif
 
 void null::finishChild(bool is_timeout) {}
 
