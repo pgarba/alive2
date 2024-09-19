@@ -11,6 +11,8 @@
 #include <numeric>
 #include <string>
 
+#include <algorithm>
+
 using namespace IR;
 using namespace smt;
 using namespace std;
